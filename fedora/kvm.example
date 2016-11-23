@@ -1,0 +1,2 @@
+sudo yum install kvm  virt-manager libvirt libvirt-python appliance-tools libguestfs-tools
+virt-tar-out -a /var/lib/libvirt/images/generic.qcow2 / - | gzip --best > alpine.tgz
