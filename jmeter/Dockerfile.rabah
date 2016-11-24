@@ -1,0 +1,46 @@
+#
+#Version 0.0.1:Jemeter server test
+FROM  fedora23_maj
+
+MAINTAINER RABAH GUITTOUNE
+#ENV   variable
+
+ENV    JMETER_VERSION 3.1
+
+ENV     JMETER_HOME /home/jmeter/apache-jmeter-3.1/
+ENV    JMETER_DOWNLOAD_URL https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-${JMETER_VERSION}.tgz
+ENV     PATH  $JMETER_HOME/bin:${PATH}#Updating system
+
+#RUN  dnf -y update 
+#Installing basic tools
+
+RUN  dnf install -y tar
+RUN  dnf install -y wget
+ 
+#Installing git
+RUN  dnf install -y git 
+#Install Java jdk
+RUN  dnf install -y java-1.8.0-openjdk-headless.x86_64
+#Download and Install jmeter
+RUN   mkdir -p /home/jmeter
+WORKDIR /home/jmeter
+RUN   wget ${JMETER_DOWNLOAD_URL} && tar -zxvf apache-jmeter-3.1.tgz && rm apache-jmeter-3.1.tgz
+#Clone git
+RUN mkdir -p /home/developpement
+WORKDIR /home/developpement
+RUN   git clone https://github.com/astondevops/web_server_flask.git
+WORKDIR /home/developpement/web_server_flask/jmeter_jmx/
+RUN   sed -i -e "s/\/home\/formateur\/apache-jmeter-3.0\/bin\/jmeter/\/home\/jmeter\/apache-jmeter-3.1\/bin\/jmeter/g" "jmeter_ligne_commande.sh"
+RUN   sed -i -e "s/\/home\/formateur\/PycharmProjects/\/home\/developpement/g" "jmeter_ligne_commande.sh"
+#rm doc
+RUN  rm -fr /home/apache-jmeter-3.1/doc
+#volume
+VOLUME $JMETER_HOME
+VOLUME ['/jmeter_log']
+#Clean-up
+run dnf clean all 
+WORKDIR $JMETER_HOME/bin  
+#CMD python3 hello.py runserver
+#ENTRYPOINT ["jmeter"]
+WORKDIR /home/developpement/web_server_flask/jmeter_jmx
+CMD ["jmeter_ligne_command.sh"] 
